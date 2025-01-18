@@ -1,19 +1,11 @@
 const mongoose = require("mongoose");
-const Trip = mongoose.model("Trip", { 
-    sneaker: String,
-    size: Number,
-    price: Number,
-    amount: Number,
-    image: String,
-    sneakerConfigs: Array,
-    firstname: String,
-    lastname: String,
-    email: String,
-    telephone: String,
-    address: Array,
-    payment: Array,
-    date: String, 
-    status: String,
+
+const tripSchema = new mongoose.Schema({
+    TripName: { type: String, required: true },
+    Place: { type: String, required: true },
+    StartDate: { type: Date, required: true },
+    EndDate: { type: Date, required: true },
 });
 
+const Trip = mongoose.model("Trip", tripSchema);
 module.exports = Trip;

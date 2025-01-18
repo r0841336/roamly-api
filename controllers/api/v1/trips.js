@@ -1,43 +1,30 @@
 const Trip = require("../../../models/api/v1/Trip");
 
 // function to create a new order
-const create = (req, res) => {
-    const TripName = req.TripName;
-    const Place = req.Place;
-    const StartDate = req.StartDate;
-    const EndDate = req.EndDate;
-    
-    const trip = new Trip({ 
-        TripName: TripName,
-        Place: Place,
-        StartDate: StartDate,
-        EndDate: EndDate
-    });
-    
-    trip.save().then(() => {
-        res.json({
-            status: "success",
-            data: {
-                trip: trips,
-            },
-        });
-    });
-};
+const create = async (req, res) => {
+    const { TripName, Place, StartDate, EndDate } = req.body; // Correct gebruik van req.body
 
-// function to get all the orders
-const index = async (req, res) => {
+    if (!TripName || !Place || !StartDate || !EndDate) {
+        return res.status(400).json({ status: "error", message: "All fields are required" });
+    }
+
     try {
-        const trips = await Trip.find({});
+        const trip = new Trip({
+            TripName,
+            Place,
+            StartDate,
+            EndDate
+        });
+        await trip.save();
         res.json({
             status: "success",
-            data: {
-                trips: trips,
-            },
+            data: { trip }
         });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Internal server error:", error: error.message });
+        res.status(500).json({ status: "error", message: error.message });
     }
 };
+
 
 module.exports = {
     create,
