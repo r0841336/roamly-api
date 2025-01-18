@@ -2,10 +2,10 @@ const Trip = require("../../../models/api/v1/Trip");
 
 // function to create a new order
 const create = (req, res) => {
-    const TripName = req.body.TripName;
-    const Place = req.body.Place;
-    const StartDate = req.body.StartDate;
-    const EndDate = req.body.EndDate;
+    const TripName = req.TripName;
+    const Place = req.Place;
+    const StartDate = req.StartDate;
+    const EndDate = req.EndDate;
     
     const trip = new Trip({ 
         TripName: TripName,
