@@ -2,39 +2,16 @@ const Trip = require("../../../models/api/v1/Trip");
 
 // function to create a new order
 const create = (req, res) => {
-    const sneaker = req.body.order.sneaker;
-    const size = req.body.order.size;
-    const price = req.body.order.price;
-    const amount = req.body.order.amount;
-    const image = req.body.order.image;
-    const configs = req.body.order.sneakerConfigs;
-    const firstname = req.body.order.firstname;
-    const lastname = req.body.order.lastname;
-    const email = req.body.order.email;
-    const telephone = req.body.order.tel;
-    const address = req.body.order.address;
-    const payment = req.body.order.payment;
-    const status = req.body.order.status;
-
-    const date = new Date();
-    date.setHours(date.getHours() + 1);
-    const updatedDate = date.toJSON();
+    const TripName = req.body.TripName;
+    const Place = req.body.Place;
+    const StartDate = req.body.StartDate;
+    const EndDate = req.body.EndDate;
     
     const trip = new Trip({ 
-        sneaker: sneaker,
-        size: size,
-        price: price,
-        amount: amount,
-        image: image, 
-        sneakerConfigs: configs,
-        firstname: firstname,
-        lastname: lastname,
-        telephone: telephone,
-        email: email,
-        address: address,
-        payment: payment,
-        date: updatedDate,
-        status: status,
+        TripName: TripName,
+        Place: Place,
+        StartDate: StartDate,
+        EndDate: EndDate
     });
     
     trip.save().then(() => {
