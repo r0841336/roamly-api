@@ -30,7 +30,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Using the routes
-app.use('/api/v1/trips', tripRouter);
+app.use('/api/v1/trips', tripRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
