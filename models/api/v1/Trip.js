@@ -1,11 +1,9 @@
 const mongoose = require("mongoose");
-
-const TripSchema = new mongoose.Schema({
-    TripName: destination,
-    Place: destination,
-    StartDate: dates[0].toISOString(),
-    EndDate: dates[1].toISOString(),
-    Plan: cleanedResponse,
+const Trip = mongoose.model("Trip", { 
+    TripName: String,
+    Place: String,
+    StartDate: String,
+    EndDate: String
 });
 
-module.exports = mongoose.model("Trip", TripSchema);
+module.exports = Trip;
