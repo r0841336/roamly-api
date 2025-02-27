@@ -1,9 +1,13 @@
-const mongoose = require("mongoose");
-const Trip = mongoose.model("Trip", { 
-    TripName: String,
-    Place: String,
-    StartDate: String,
-    EndDate: String
+const mongoose = require('mongoose');
+
+const TripSchema = new mongoose.Schema({
+    TripName: { type: String, required: true },
+    Place: { type: String, required: true },
+    StartDate: { type: Date, required: true },
+    EndDate: { type: Date, required: true },
+    Plan: { type: mongoose.Schema.Types.Mixed, required: true } // Hier kan de hele AI-response in!
 });
+
+const Trip = mongoose.model('Trip', TripSchema);
 
 module.exports = Trip;
