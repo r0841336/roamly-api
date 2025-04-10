@@ -21,16 +21,20 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
   });
 
 // Importing the routes
-var tripRoutes = require('./routes/api/v1/trips'); // Verander tripRouter naar tripRoutes voor consistentie
+var tripRoutes = require('./routes/api/v1/trips'); // Routes voor trips
+var userRoutes = require('./routes/api/v1/users'); // Routes voor users (toegevoegd)
 
+// Middleware
 var app = express();
 
 // view engine setup (optioneel: overschakelen naar EJS)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade'); // Je kunt dit ook naar EJS veranderen als je dat wilt
 
+// Enable CORS
 app.use(cors());
 
+// Logging en body parsing middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -38,7 +42,8 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Using the routes
-app.use('/api/v1/trips', tripRoutes); // Zorg ervoor dat tripRoutes consistent wordt genoemd
+app.use('/api/v1/trips', tripRoutes); // Gebruik de routes voor trips
+app.use('/api/v1/users', userRoutes); // Gebruik de routes voor users (toegevoegd)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
