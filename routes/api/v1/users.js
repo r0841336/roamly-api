@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const { register, login, me } = require('../../../controllers/api/v1/Users');
-const authenticate = require('../../../middleware/authenticate'); // Importeer de authenticate middleware
+const authenticate = require('../../../middleware/Authentication'); // Importeer de authenticate middleware
 
 // Registratie route
 router.post('/register', register);
