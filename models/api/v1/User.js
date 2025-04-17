@@ -5,15 +5,43 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, // Zorg ervoor dat e-mails uniek zijn
-        lowercase: true, // E-mail wordt altijd in kleine letters opgeslagen
+        unique: true,
+        lowercase: true,
     },
     password: {
         type: String,
-        required: true, // Wachtwoord is verplicht
+        required: true,
+    },
+    firstName: {
+        type: String,
+    },
+    lastName: {
+        type: String,
+    },
+    country: {
+        type: String,
+    },
+    postcode: {
+        type: String,
+    },
+    city: {
+        type: String,
+    },
+    street: {
+        type: String,
+    },
+    houseNumber: {
+        type: String,
+    },
+    phoneNumber: {
+        type: String,
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other'],
     },
 }, {
-    timestamps: true, // Dit voegt automatisch `createdAt` en `updatedAt` toe aan het schema
+    timestamps: true,
 });
 
 // Maak een User model
