@@ -1,12 +1,24 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../../../models/api/v1/User'); // Zorg ervoor dat je model voor User goed is ingesteld!
+const User = require('../../../models/api/v1/User');
 
 // Registratie functie (POST)
 const register = async (req, res) => {
-    const { email, password } = req.body;
+    const {
+        email,
+        password,
+        firstName,
+        lastName,
+        country,
+        postcode,
+        city,
+        street,
+        houseNumber,
+        phoneNumber,
+        gender
+    } = req.body;
 
-    // Controleer of alle vereiste velden aanwezig zijn
+    // Controleer of verplichte velden aanwezig zijn
     if (!email || !password) {
         return res.status(400).json({
             status: "error",
@@ -15,7 +27,7 @@ const register = async (req, res) => {
     }
 
     try {
-        // Controleer of de gebruiker al bestaat
+        // Check of de gebruiker al bestaat
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -24,17 +36,26 @@ const register = async (req, res) => {
             });
         }
 
-        // Hash het wachtwoord
+        // Hash wachtwoord
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Maak een nieuwe gebruiker aan
+        // Nieuwe gebruiker aanmaken
         const user = new User({
             email,
             password: hashedPassword,
+            firstName,
+            lastName,
+            country,
+            postcode,
+            city,
+            street,
+            houseNumber,
+            phoneNumber,
+            gender
         });
 
-        // Sla de gebruiker op in de database
         await user.save();
+
         res.status(201).json({
             status: "success",
             data: { user },
@@ -52,7 +73,6 @@ const register = async (req, res) => {
 const login = async (req, res) => {
     const { email, password } = req.body;
 
-    // Controleer of de vereiste velden aanwezig zijn
     if (!email || !password) {
         return res.status(400).json({
             status: "error",
@@ -61,7 +81,6 @@ const login = async (req, res) => {
     }
 
     try {
-        // Zoek de gebruiker op basis van e-mail
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
@@ -70,7 +89,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Vergelijk het ingevoerde wachtwoord met het gehashte wachtwoord
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(400).json({
@@ -79,7 +97,6 @@ const login = async (req, res) => {
             });
         }
 
-        // Genereer een JWT-token
         const token = jwt.sign({ userId: user._id }, 'je_geheime_sleutel', { expiresIn: '1h' });
 
         res.status(200).json({
@@ -95,10 +112,10 @@ const login = async (req, res) => {
     }
 };
 
-// Functie om een gebruiker te verkrijgen op basis van token
+// Profiel ophalen (GET /me)
 const me = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId); // Gebruiker op basis van de userId uit de JWT
+        const user = await User.findById(req.user.userId);
         res.json({
             status: "success",
             data: { user },
