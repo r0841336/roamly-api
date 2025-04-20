@@ -18,7 +18,6 @@ const register = async (req, res) => {
         gender
     } = req.body;
 
-    // Controleer of verplichte velden aanwezig zijn
     if (!email || !password) {
         return res.status(400).json({
             status: "error",
@@ -27,7 +26,6 @@ const register = async (req, res) => {
     }
 
     try {
-        // Check of de gebruiker al bestaat
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({
@@ -36,10 +34,8 @@ const register = async (req, res) => {
             });
         }
 
-        // Hash wachtwoord
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Nieuwe gebruiker aanmaken
         const user = new User({
             email,
             password: hashedPassword,
@@ -56,9 +52,14 @@ const register = async (req, res) => {
 
         await user.save();
 
+        // Maak token aan na registratie
+        const token = jwt.sign({ userId: user._id }, 'je_geheime_sleutel', { expiresIn: '1h' });
+        user.token = token;
+        await user.save();
+
         res.status(201).json({
             status: "success",
-            data: { user },
+            data: { user, token },
         });
     } catch (error) {
         res.status(500).json({
@@ -98,6 +99,8 @@ const login = async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user._id }, 'je_geheime_sleutel', { expiresIn: '1h' });
+        user.token = token;
+        await user.save();
 
         res.status(200).json({
             status: "success",
