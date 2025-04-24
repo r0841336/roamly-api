@@ -247,21 +247,37 @@ const verifyResetCode = async (req, res) => {
 
 // Wachtwoord resetten functie (POST /reset-password)
 const resetPassword = async (req, res) => {
-    const { email, newPassword } = req.body;
+    const { email, resetPasswordCode, newPassword } = req.body;
 
-    if (!email || !newPassword) {
+    if (!email || !resetPasswordCode || !newPassword) {
         return res.status(400).json({
             status: "error",
-            message: "Email en nieuw wachtwoord zijn verplicht.",
+            message: "Email, resetcode en nieuw wachtwoord zijn verplicht.",
         });
     }
 
     try {
+        // Verifieer de resetcode voordat we het wachtwoord resetten
         const user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({
                 status: "error",
                 message: "Gebruiker niet gevonden.",
+            });
+        }
+
+        // Controleer of de resetcode overeenkomt en niet verlopen is
+        if (user.resetPasswordCode !== resetPasswordCode) {
+            return res.status(400).json({
+                status: "error",
+                message: "Ongeldige resetcode.",
+            });
+        }
+
+        if (Date.now() > user.resetPasswordExpire) {
+            return res.status(400).json({
+                status: "error",
+                message: "De resetcode is verlopen.",
             });
         }
 
