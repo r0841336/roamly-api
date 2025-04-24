@@ -42,6 +42,13 @@ const userSchema = new mongoose.Schema({
     },
     token: {
         type: String, // <-- JWT token veld toegevoegd
+    },
+    // Nieuwe velden voor wachtwoordreset
+    resetPasswordCode: {
+        type: String,  // Code die wordt gebruikt voor wachtwoordreset
+    },
+    resetPasswordExpire: {
+        type: Date,  // Vervaldatum voor de resetcode
     }
 }, {
     timestamps: true,

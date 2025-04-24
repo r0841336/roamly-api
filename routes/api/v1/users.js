@@ -1,8 +1,8 @@
-// routes/api/v1/users.js
 const express = require('express');
 const router = express.Router();
-const { register, login, me } = require('../../../controllers/api/v1/Users');
+const { register, login, me, forgotPassword, resetPassword } = require('../../../controllers/api/v1/Users');
 const authenticate = require('../../../middleware/Authentication'); // Importeer de authenticate middleware
+const User = require('../../../models/api/v1/User');
 
 // Registratie route
 router.post('/register', register);
@@ -10,9 +10,16 @@ router.post('/register', register);
 // Login route
 router.post('/login', login);
 
+// Profiel ophalen route (met authenticatie)
 router.get('/me', authenticate, me);
 
-// Nieuwe route voor het ophalen van alle gebruikers
+// Nieuwe route voor het aanvragen van een wachtwoordreset
+router.post('/forgot-password', forgotPassword);
+
+// Nieuwe route voor het resetten van het wachtwoord
+router.post('/reset-password', resetPassword);
+
+// Nieuwe route voor het ophalen van alle gebruikers (beschermd met authenticatie)
 router.get('/', authenticate, async (req, res) => {
     try {
         // Haal alle gebruikers op uit de database
