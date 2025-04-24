@@ -155,7 +155,7 @@ const forgotPassword = async (req, res) => {
         }
 
         // Genereer een willekeurige resetcode
-        const resetPasswordCode = crypto.randomBytes(6).toString('hex');
+        const resetPasswordCode = crypto.randomBytes(3).toString('hex'); // Code van 6 tekens
         const resetPasswordExpire = Date.now() + 3600000; // Code vervalt na 1 uur
 
         // Sla de resetcode en vervaldatum op in de database
