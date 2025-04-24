@@ -37,7 +37,7 @@ exports.getReviewById = async (req, res) => {
   }
 };
 
-// Update a review (met save() zodat middleware en validatie werkt)
+// Update a review (volledige update via PUT)
 exports.updateReview = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
@@ -52,6 +52,24 @@ exports.updateReview = async (req, res) => {
   } catch (error) {
     console.error('Error updating review:', error);
     res.status(400).json({ error: error.message });
+  }
+};
+
+// Partiële update via PATCH
+exports.updateReviewPartial = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).send("Not found");
+    }
+
+    Object.assign(review, req.body);
+    await review.save();
+
+    res.status(204).end();
+  } catch (err) {
+    console.error('Error partially updating review:', err);
+    res.status(500).send("Error updating review");
   }
 };
 
