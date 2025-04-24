@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, me, forgotPassword, resetPassword } = require('../../../controllers/api/v1/Users');
+const { register, login, me, forgotPassword, resetPassword, verifyResetCode } = require('../../../controllers/api/v1/Users'); // Vergeet niet verifyResetCode toe te voegen
 const authenticate = require('../../../middleware/Authentication'); // Importeer de authenticate middleware
 const User = require('../../../models/api/v1/User');
 
@@ -18,6 +18,9 @@ router.post('/forgot-password', forgotPassword);
 
 // Nieuwe route voor het resetten van het wachtwoord
 router.post('/reset-password', resetPassword);
+
+// Nieuwe route voor het verifiëren van de resetcode
+router.post('/verify-reset-code', verifyResetCode); // Toegevoegd
 
 // Nieuwe route voor het ophalen van alle gebruikers (beschermd met authenticatie)
 router.get('/', authenticate, async (req, res) => {
