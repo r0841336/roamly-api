@@ -7,6 +7,7 @@ exports.createReview = async (req, res) => {
     await review.save();
     res.status(201).json(review);
   } catch (error) {
+    console.error('Error creating review:', error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -17,6 +18,7 @@ exports.getAllReviews = async (req, res) => {
     const reviews = await Review.find();
     res.json(reviews);
   } catch (error) {
+    console.error('Error getting reviews:', error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -25,20 +27,30 @@ exports.getAllReviews = async (req, res) => {
 exports.getReviewById = async (req, res) => {
   try {
     const review = await Review.findById(req.params.id);
-    if (!review) return res.status(404).json({ message: 'Review not found' });
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
     res.json(review);
   } catch (error) {
+    console.error('Error getting review by ID:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
-// Update a review
+// Update a review (met save() zodat middleware en validatie werkt)
 exports.updateReview = async (req, res) => {
   try {
-    const updatedReview = await Review.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedReview) return res.status(404).json({ message: 'Review not found' });
-    res.json(updatedReview);
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    Object.assign(review, req.body); // Kopieer nieuwe velden naar bestaande review
+    await review.save(); // Save om validaties/middleware te laten draaien
+
+    res.status(204).end(); // Succesvol zonder content
   } catch (error) {
+    console.error('Error updating review:', error);
     res.status(400).json({ error: error.message });
   }
 };
@@ -47,9 +59,12 @@ exports.updateReview = async (req, res) => {
 exports.deleteReview = async (req, res) => {
   try {
     const deletedReview = await Review.findByIdAndDelete(req.params.id);
-    if (!deletedReview) return res.status(404).json({ message: 'Review not found' });
+    if (!deletedReview) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
     res.json({ message: 'Review deleted' });
   } catch (error) {
+    console.error('Error deleting review:', error);
     res.status(500).json({ error: error.message });
   }
 };
