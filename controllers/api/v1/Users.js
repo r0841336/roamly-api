@@ -195,14 +195,14 @@ const forgotPassword = async (req, res) => {
     }
 };
 
-// Wachtwoord resetten functie (POST /reset-password)
-const resetPassword = async (req, res) => {
-    const { email, resetPasswordCode, newPassword } = req.body;
+// Verificatie van de resetcode functie (POST /verify-reset-code)
+const verifyResetCode = async (req, res) => {
+    const { email, resetPasswordCode } = req.body;
 
-    if (!email || !resetPasswordCode || !newPassword) {
+    if (!email || !resetPasswordCode) {
         return res.status(400).json({
             status: "error",
-            message: "Alle velden zijn verplicht.",
+            message: "Email en resetcode zijn verplicht.",
         });
     }
 
@@ -230,7 +230,42 @@ const resetPassword = async (req, res) => {
             });
         }
 
-        // Wachtwoord opnieuw instellen
+        // Als de code geldig is, stuur een succesbericht
+        res.status(200).json({
+            status: "success",
+            message: "De resetcode is geldig.",
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            status: "error",
+            message: "Er is een fout opgetreden bij de verificatie van de resetcode.",
+            error: error.message,
+        });
+    }
+};
+
+// Wachtwoord resetten functie (POST /reset-password)
+const resetPassword = async (req, res) => {
+    const { email, newPassword } = req.body;
+
+    if (!email || !newPassword) {
+        return res.status(400).json({
+            status: "error",
+            message: "Email en nieuw wachtwoord zijn verplicht.",
+        });
+    }
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(400).json({
+                status: "error",
+                message: "Gebruiker niet gevonden.",
+            });
+        }
+
+        // Stel het nieuwe wachtwoord in
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         user.password = hashedPassword;
         user.resetPasswordCode = undefined; // Verwijder de code na gebruik
@@ -256,5 +291,6 @@ module.exports = {
     login,
     me,
     forgotPassword,
+    verifyResetCode,
     resetPassword
 };
