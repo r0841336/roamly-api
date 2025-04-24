@@ -245,7 +245,7 @@ const verifyResetCode = async (req, res) => {
     }
 };
 
-// Wachtwoord resetten functie (POST /reset-password)
+// Wachtwoord resetten functie (PUT /reset-password)
 const resetPassword = async (req, res) => {
     const { email, resetPasswordCode, newPassword } = req.body;
 
