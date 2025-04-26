@@ -70,7 +70,11 @@ exports.updateReviewPartial = async (req, res) => {
     if (req.body.points) {
       review.points += req.body.points; // ✅ punten bijtellen ipv overschrijven
     }
-
+    if (req.body.sectionsCompleted) {
+      if (!review.sectionsCompleted.includes(req.body.sectionsCompleted)) {
+        review.sectionsCompleted.push(req.body.sectionsCompleted);
+      }
+    }
     await review.save();
 
     res.status(204).end();
