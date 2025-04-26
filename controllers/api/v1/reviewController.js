@@ -63,18 +63,23 @@ exports.updateReviewPartial = async (req, res) => {
       return res.status(404).send("Not found");
     }
 
-    // 1. Merge de data
-    Object.assign(review, req.body);
+    // Merge section data (parking, entrance, etc.)
+    const updateFields = { ...req.body };
+    delete updateFields.points;
+    delete updateFields.sectionsCompleted;
 
-    // 2. Check of er punten bij moeten komen
+    Object.assign(review, updateFields);
+
+    // Add +1 point safely
     if (req.body.points) {
-      review.points += req.body.points; // ✅ punten bijtellen ipv overschrijven
+      review.points += req.body.points;
     }
-    if (req.body.sectionsCompleted) {
-      if (!review.sectionsCompleted.includes(req.body.sectionsCompleted)) {
-        review.sectionsCompleted.push(req.body.sectionsCompleted);
-      }
-    }
+
+    // Add completed section safely
+    if (req.body.sectionsCompleted && !review.sectionsCompleted.includes(req.body.sectionsCompleted)) {
+      review.sectionsCompleted.push(req.body.sectionsCompleted);
+    }
+
     await review.save();
 
     res.status(204).end();
