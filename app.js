@@ -22,8 +22,7 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
 
 // Importing the routes
 var tripRoutes = require('./routes/api/v1/trips'); // Routes voor trips
-var userRoutes = require('./routes/api/v1/users'); // Routes voor users
-var reviewRoutes = require('./routes/api/v1/reviews'); // Routes voor reviews (toegevoegd)
+var userRoutes = require('./routes/api/v1/users'); // Routes voor users (toegevoegd)
 
 // Middleware
 var app = express();
@@ -44,8 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Using the routes
 app.use('/api/v1/trips', tripRoutes); // Gebruik de routes voor trips
-app.use('/api/v1/users', userRoutes); // Gebruik de routes voor users
-app.use('/api/v1/reviews', reviewRoutes); // Gebruik de routes voor reviews (toegevoegd)
+app.use('/api/v1/users', userRoutes); // Gebruik de routes voor users (toegevoegd)
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
