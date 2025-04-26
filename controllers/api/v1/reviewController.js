@@ -63,29 +63,17 @@ exports.updateReviewPartial = async (req, res) => {
       return res.status(404).send("Not found");
     }
 
-    const updateData = req.body; // wat je binnenkrijgt
-    const section = Object.keys(updateData)[0]; // bijvoorbeeld 'parking', 'entrance', etc.
+    // 1. Merge de data
+    Object.assign(review, req.body);
 
-    if (section && review[section] !== undefined) {
-      // Alleen die specifieke sectie updaten
-      review[section] = { 
-        ...review[section], 
-        ...updateData[section] 
-      };
-
-      // Punten automatisch verhogen
-      review.points = (review.points || 0) + 1;
-
-      // Sectie markeren als completed
-      if (!review.sectionsCompleted.includes(section)) {
-        review.sectionsCompleted.push(section);
-      }
-
-      await review.save();
-      res.status(200).json(review);
-    } else {
-      res.status(400).send("Invalid update data");
+    // 2. Check of er punten bij moeten komen
+    if (req.body.points) {
+      review.points += req.body.points; // ✅ punten bijtellen ipv overschrijven
     }
+
+    await review.save();
+
+    res.status(204).end();
   } catch (err) {
     console.error('Error partially updating review:', err);
     res.status(500).send("Error updating review");
