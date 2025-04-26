@@ -40,12 +40,11 @@ app.get('/api/places', async (req, res) => {
   const { query, location, radius } = req.query;
   try {
     const response = await axios.get(PLACES_API_BASE_URL, {
-      params: {
-        query,
-        location,
-        radius,
-        key: API_KEY,
-      },
+      params: { query, location, radius, key: API_KEY },
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (compatible; RoamlyBot/1.0; +https://roamly.example.com/bot)'
+      }
     });
     if (response.data.status !== 'OK') {
       return res.status(400).json({ error: response.data.error_message || 'Geen resultaten gevonden.' });
@@ -61,11 +60,11 @@ app.get('/api/places', async (req, res) => {
     }));
     res.json(places);
   } catch (error) {
-    console.error(error.response?.data || error.message); // 👈 verbeterde error logging
-
+    console.error(error.response?.data || error.message);
     res.status(500).json({ error: error.message });
   }
 });
+
 
 // Start de server
 app.listen(PORT, () => {
