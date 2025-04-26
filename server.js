@@ -3,7 +3,7 @@ import axios from 'axios';
 import cors from 'cors';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA'; // Vervang dit door je echte API-sleutel
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
