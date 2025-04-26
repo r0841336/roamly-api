@@ -5,7 +5,7 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const API_KEY = 'AIzaSyDn0I36z7AFvn_CShOJYh1hKf-e7HA5aZk'; // Vervang dit door je echte API-sleutel
+const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA'; // Vervang dit door je echte API-sleutel
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
