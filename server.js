@@ -61,6 +61,8 @@ app.get('/api/places', async (req, res) => {
     }));
     res.json(places);
   } catch (error) {
+    console.error(error.response?.data || error.message); // 👈 verbeterde error logging
+
     res.status(500).json({ error: error.message });
   }
 });
