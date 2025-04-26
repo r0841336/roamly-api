@@ -12,6 +12,8 @@ const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 // CORS-instellingen
 app.use(cors());
 
+app.use(express.json());
+
 // Route voor het ophalen van coördinaten op basis van een locatie (gebruikt de Geocode API)
 app.get('/api/coordinates', async (req, res) => {
   const { location } = req.query;
