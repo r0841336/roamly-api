@@ -77,3 +77,34 @@ app.get('/api/places', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+import { useEffect, useState } from 'react';
+
+...
+
+const [embedUrl, setEmbedUrl] = useState(null);
+
+useEffect(() => {
+  if (coordinates) {
+    fetch(`https://roamly-api.onrender.com/api/mapembed?location=${coordinates}`)
+      .then(res => res.json())
+      .then(data => setEmbedUrl(data.embedUrl))
+      .catch(err => console.error("Fout bij ophalen embed URL:", err));
+  }
+}, [coordinates]);
+
+...
+
+<div className="hotel-map">
+  {embedUrl ? (
+    <iframe
+      src={embedUrl}
+      allowFullScreen
+      loading="lazy"
+      title="Hotel locatie"
+      className="map-iframe"
+    ></iframe>
+  ) : (
+    <p>Locatie niet beschikbaar</p>
+  )}
+</div>
