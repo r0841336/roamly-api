@@ -49,15 +49,22 @@ app.get('/api/places', async (req, res) => {
     if (response.data.status !== 'OK') {
       return res.status(400).json({ error: response.data.error_message || 'Geen resultaten gevonden.' });
     }
-    const places = response.data.results.map((place) => ({
-      id: place.place_id,
-      name: place.name,
-      address: place.formatted_address,
-      rating: place.rating,
-      photo: place.photos
-        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${API_KEY}`
-        : 'https://via.placeholder.com/320x200',
-    }));
+
+    // Voeg de coördinaten toe aan elke place
+    const places = response.data.results.map((place) => {
+      const coordinates = place.geometry.location; // Haal de coördinaten op
+      return {
+        id: place.place_id,
+        name: place.name,
+        address: place.formatted_address,
+        rating: place.rating,
+        photo: place.photos
+          ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${API_KEY}`
+          : 'https://via.placeholder.com/320x200',
+        location: coordinates, // Voeg de coördinaten toe
+      };
+    });
+
     res.json(places);
   } catch (error) {
     console.error(error.response?.data || error.message);
