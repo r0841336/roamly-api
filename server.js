@@ -72,39 +72,24 @@ app.get('/api/places', async (req, res) => {
   }
 });
 
+// Route voor het genereren van een Google Maps Embed URL
+app.get('/api/mapembed', async (req, res) => {
+  const { location } = req.query;
+  if (!location) {
+    return res.status(400).json({ error: 'Locatie is verplicht.' });
+  }
+
+  try {
+    const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${encodeURIComponent(location)}`;
+    res.json({ embedUrl });
+  } catch (error) {
+    res.status(500).json({ error: 'Kon embed URL niet genereren.' });
+  }
+});
+
 
 // Start de server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-import { useEffect, useState } from 'react';
-
-...
-
-const [embedUrl, setEmbedUrl] = useState(null);
-
-useEffect(() => {
-  if (coordinates) {
-    fetch(`https://roamly-api.onrender.com/api/mapembed?location=${coordinates}`)
-      .then(res => res.json())
-      .then(data => setEmbedUrl(data.embedUrl))
-      .catch(err => console.error("Fout bij ophalen embed URL:", err));
-  }
-}, [coordinates]);
-
-...
-
-<div className="hotel-map">
-  {embedUrl ? (
-    <iframe
-      src={embedUrl}
-      allowFullScreen
-      loading="lazy"
-      title="Hotel locatie"
-      className="map-iframe"
-    ></iframe>
-  ) : (
-    <p>Locatie niet beschikbaar</p>
-  )}
-</div>
