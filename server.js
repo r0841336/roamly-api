@@ -107,8 +107,8 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
   });
 
 // Importeer de routes voor trips en users
-import tripRoutes from './routes/api/v1/trips'; // Zorg ervoor dat dit bestand bestaat
-import userRoutes from './routes/api/v1/users'; // Zorg ervoor dat dit bestand bestaat
+import tripRoutes from '../roamly-api/routes/api/v1/trips'; // Zorg ervoor dat dit bestand bestaat
+import userRoutes from '../routes/api/v1/users'; // Zorg ervoor dat dit bestand bestaat
 
 // Middleware
 app.use(logger('dev'));
