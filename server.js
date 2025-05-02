@@ -1,20 +1,26 @@
 import express from 'express';
 import axios from 'axios';
 import cors from 'cors';
+import mongoose from 'mongoose';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import logger from 'morgan';
+import config from 'config';
+import createError from 'http-errors';
+
+// ---- Google API Routes ----
+const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA'; // Vul je echte API-sleutel hier in
+const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
+const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA'; // Vervang dit door je echte API-sleutel
-const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
-const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-
 // CORS-instellingen
 app.use(cors());
-
 app.use(express.json());
 
-// Route voor het ophalen van coördinaten op basis van een locatie (gebruikt de Geocode API)
+// Route voor het ophalen van coördinaten
 app.get('/api/coordinates', async (req, res) => {
   const { location } = req.query;
   try {
@@ -35,7 +41,7 @@ app.get('/api/coordinates', async (req, res) => {
   }
 });
 
-// Route voor het ophalen van plaatsen (hotels, restaurants, etc.)
+// Route voor het ophalen van plaatsen
 app.get('/api/places', async (req, res) => {
   const { query, location, radius } = req.query;
   try {
@@ -43,16 +49,15 @@ app.get('/api/places', async (req, res) => {
       params: { query, location, radius, key: API_KEY },
       headers: {
         'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (compatible; RoamlyBot/1.0; +https://roamly.example.com/bot)'
-      }
+        'User-Agent': 'Mozilla/5.0 (compatible; RoamlyBot/1.0; +https://roamly.example.com/bot)',
+      },
     });
     if (response.data.status !== 'OK') {
       return res.status(400).json({ error: response.data.error_message || 'Geen resultaten gevonden.' });
     }
 
-    // Voeg de coördinaten toe aan elke place
     const places = response.data.results.map((place) => {
-      const coordinates = place.geometry.location; // Haal de coördinaten op
+      const coordinates = place.geometry.location;
       return {
         id: place.place_id,
         name: place.name,
@@ -61,7 +66,7 @@ app.get('/api/places', async (req, res) => {
         photo: place.photos
           ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${API_KEY}`
           : 'https://via.placeholder.com/320x200',
-        location: coordinates, // Voeg de coördinaten toe
+        location: coordinates,
       };
     });
 
@@ -87,27 +92,10 @@ app.get('/api/mapembed', async (req, res) => {
   }
 });
 
+// ---- MongoDB Verbinding en Routes ----
 
-// Start de server
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-//---------------------------------------------
-//app.js
-//---------------------------------------------
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var config = require('config');
-var cors = require("cors");
-
-// Connecting to the database
-const mongoose = require("mongoose");
-const connection = config.get("mongodb");
-
+// Verbinding maken met MongoDB
+const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
 mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
@@ -115,48 +103,36 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
   })
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Stop the app if the DB connection fails
+    process.exit(1); // Stop de app als de DB-verbinding mislukt
   });
 
-// Importing the routes
-var tripRoutes = require('./routes/api/v1/trips'); // Routes voor trips
-var userRoutes = require('./routes/api/v1/users'); // Routes voor users (toegevoegd)
+// Importeer de routes voor trips en users
+import tripRoutes from './routes/api/v1/trips'; // Zorg ervoor dat dit bestand bestaat
+import userRoutes from './routes/api/v1/users'; // Zorg ervoor dat dit bestand bestaat
 
 // Middleware
-//var app = express();
-
-// view engine setup (optioneel: overschakelen naar EJS)
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade'); // Je kunt dit ook naar EJS veranderen als je dat wilt
-
-// Enable CORS
-app.use(cors());
-
-// Logging en body parsing middleware
 app.use(logger('dev'));
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Using the routes
-app.use('/api/v1/trips', tripRoutes); // Gebruik de routes voor trips
-app.use('/api/v1/users', userRoutes); // Gebruik de routes voor users (toegevoegd)
+// Gebruik de routes voor trips en users
+app.use('/api/v1/trips', tripRoutes); // Routes voor trips
+app.use('/api/v1/users', userRoutes); // Routes voor users
 
-// catch 404 and forward to error handler
+// Error Handling
 app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
-module.exports = app;
+// Start de server
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
