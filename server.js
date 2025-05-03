@@ -107,8 +107,10 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
   });
 
 // Importeer de routes voor trips en users
-import tripRoutes from './routes/api/v1/trips.js';
-import userRoutes from './routes/api/v1/users.js';
+
+const tripRoutes = require('./routes/api/v1/trips');
+const userRoutes = require('./routes/api/v1/users');
+
 
 
 
