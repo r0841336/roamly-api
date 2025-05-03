@@ -7,20 +7,32 @@ import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import config from 'config';
 import createError from 'http-errors';
+import tripRoutes from './routes/api/v1/trips.js';
+import userRoutes from './routes/api/v1/users.js';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// Vervanging voor __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // ---- Google API Routes ----
-const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA'; // Vul je echte API-sleutel hier in
+const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA';
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// CORS-instellingen
+// Middleware
 app.use(cors());
 app.use(express.json());
+app.use(logger('dev'));
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Route voor het ophalen van coördinaten
+// Google Maps API Routes
 app.get('/api/coordinates', async (req, res) => {
   const { location } = req.query;
   try {
@@ -41,7 +53,6 @@ app.get('/api/coordinates', async (req, res) => {
   }
 });
 
-// Route voor het ophalen van plaatsen
 app.get('/api/places', async (req, res) => {
   const { query, location, radius } = req.query;
   try {
@@ -77,66 +88,42 @@ app.get('/api/places', async (req, res) => {
   }
 });
 
-// Route voor het genereren van een Google Maps Embed URL
-app.get('/api/mapembed', async (req, res) => {
+app.get('/api/mapembed', (req, res) => {
   const { location } = req.query;
   if (!location) {
     return res.status(400).json({ error: 'Locatie is verplicht.' });
   }
-
-  try {
-    const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${encodeURIComponent(location)}`;
-    res.json({ embedUrl });
-  } catch (error) {
-    res.status(500).json({ error: 'Kon embed URL niet genereren.' });
-  }
+  const embedUrl = `https://www.google.com/maps/embed/v1/place?key=${API_KEY}&q=${encodeURIComponent(location)}`;
+  res.json({ embedUrl });
 });
 
-// ---- MongoDB Verbinding en Routes ----
-
-// Verbinding maken met MongoDB
+// MongoDB Verbinding
 const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
 mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Successfully connected to MongoDB');
-  })
+  .then(() => console.log('Successfully connected to MongoDB'))
   .catch((err) => {
     console.error('MongoDB connection error:', err);
-    process.exit(1); // Stop de app als de DB-verbinding mislukt
+    process.exit(1);
   });
 
-// Importeer de routes voor trips en users
+// Routes
+app.use('/api/v1/trips', tripRoutes);
+app.use('/api/v1/users', userRoutes);
 
-const tripRoutes = require('./routes/api/v1/trips');
-const userRoutes = require('./routes/api/v1/users');
-
-
-
-
-// Middleware
-app.use(logger('dev'));
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Gebruik de routes voor trips en users
-app.use('/api/v1/trips', tripRoutes); // Routes voor trips
-app.use('/api/v1/users', userRoutes); // Routes voor users
-
-// Error Handling
-app.use(function(req, res, next) {
+// Error handlers
+app.use((req, res, next) => {
   next(createError(404));
 });
 
-app.use(function(err, req, res, next) {
+app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   res.status(err.status || 500);
-  res.render('error');
+  res.json({ error: err.message });
 });
 
-// Start de server
+// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
