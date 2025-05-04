@@ -1,28 +1,22 @@
-import express from 'express';
-import axios from 'axios';
-import cors from 'cors';
-import mongoose from 'mongoose';
-import path from 'path';
-import cookieParser from 'cookie-parser';
-import logger from 'morgan';
-import config from 'config';
-import createError from 'http-errors';
-import tripRoutes from './routes/api/v1/trips.js';
-import userRoutes from './routes/api/v1/users.js';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+const express = require('express');
+const axios = require('axios');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const config = require('config');
+const createError = require('http-errors');
+const tripRoutes = require('./routes/api/v1/trips');
+const userRoutes = require('./routes/api/v1/users');
 
-// Vervanging voor __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const app = express();
+const PORT = process.env.PORT || 5001;
 
 // ---- Google API Routes ----
 const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA';
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
-
-const app = express();
-const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors());
@@ -63,6 +57,7 @@ app.get('/api/places', async (req, res) => {
         'User-Agent': 'Mozilla/5.0 (compatible; RoamlyBot/1.0; +https://roamly.example.com/bot)',
       },
     });
+
     if (response.data.status !== 'OK') {
       return res.status(400).json({ error: response.data.error_message || 'Geen resultaten gevonden.' });
     }
