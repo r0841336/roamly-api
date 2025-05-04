@@ -92,6 +92,46 @@ app.get('/api/mapembed', (req, res) => {
   res.json({ embedUrl });
 });
 
+
+app.get('/api/place/:id', async (req, res) => {
+  const placeId = req.params.id;
+
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/place/details/json', {
+      params: {
+        place_id: placeId,
+        key: API_KEY,
+        fields: 'name,rating,formatted_address,formatted_phone_number,website,photos,geometry,editorial_summary'
+      }
+    });
+
+    if (response.data.status !== 'OK') {
+      return res.status(400).json({ error: response.data.error_message || 'Details niet gevonden.' });
+    }
+
+    const place = response.data.result;
+
+    res.json({
+      id: placeId,
+      name: place.name,
+      address: place.formatted_address,
+      phone: place.formatted_phone_number,
+      website: place.website,
+      rating: place.rating,
+      description: place.editorial_summary?.overview,
+      location: place.geometry?.location,
+      photo: place.photos
+        ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${API_KEY}`
+        : 'https://via.placeholder.com/320x200'
+    });
+  } catch (error) {
+    console.error('Fout bij ophalen van plaatsdetails:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
+
 // MongoDB Verbinding
 const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
