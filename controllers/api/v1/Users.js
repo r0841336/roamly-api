@@ -410,5 +410,8 @@ module.exports = {
     me,
     forgotPassword,
     verifyResetCode,
-    resetPassword
+    resetPassword,
+    getProfilePicture,
+    setProfilePicture,
+    updateProfilePicture
 };
