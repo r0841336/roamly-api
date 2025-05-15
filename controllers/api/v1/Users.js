@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const User = require('../../../models/api/v1/User');
+const authMiddleware = require('../../../middleware/Authentication');
+
 
 // Registratie functie (POST)
 const register = async (req, res) => {

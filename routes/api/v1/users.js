@@ -5,8 +5,6 @@ const authenticate = require('../../../middleware/Authentication'); // Importeer
 const User = require('../../../models/api/v1/User');
 
 router.get('/users/profile-picture', authMiddleware, userController.getProfilePicture);
-router.post('/users/profile-picture', authMiddleware, userController.setProfilePicture);
-router.put('/users/profile-picture', authMiddleware, userController.updateProfilePicture);
 
 // Registratie route
 router.post('/register', register);
