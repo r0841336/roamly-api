@@ -156,7 +156,81 @@ const getProfilePicture = async (req, res) => {
         });
     }
 };
+       // POST /api/users/profile-picture
+const setProfilePicture = async (req, res) => {
+    const { profilePicture } = req.body;
 
+    if (!profilePicture) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Profielfoto is verplicht.',
+        });
+    }
+
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
+        }
+
+        // Alleen instellen als nog niet aanwezig
+        if (user.profilePicture) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Profielfoto is al ingesteld. Gebruik PUT om te updaten.',
+            });
+        }
+
+        user.profilePicture = profilePicture;
+        await user.save();
+
+        res.status(201).json({
+            status: 'success',
+            message: 'Profielfoto succesvol opgeslagen.',
+            data: { profilePicture: user.profilePicture },
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Fout bij opslaan van profielfoto.',
+            error: error.message,
+        });
+    }
+};
+
+        // PUT /api/users/profile-picture
+const updateProfilePicture = async (req, res) => {
+    const { profilePicture } = req.body;
+
+    if (!profilePicture) {
+        return res.status(400).json({
+            status: 'error',
+            message: 'Profielfoto is verplicht.',
+        });
+    }
+
+    try {
+        const user = await User.findById(req.user.userId);
+        if (!user) {
+            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
+        }
+
+        user.profilePicture = profilePicture;
+        await user.save();
+
+        res.status(200).json({
+            status: 'success',
+            message: 'Profielfoto succesvol bijgewerkt.',
+            data: { profilePicture: user.profilePicture },
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Fout bij bijwerken van profielfoto.',
+            error: error.message,
+        });
+    }
+};
 
 // Wachtwoord reset aanvragen functie (POST /forgot-password)
 const forgotPassword = async (req, res) => {
@@ -239,48 +313,7 @@ const verifyResetCode = async (req, res) => {
             });
         }
 
-        // POST /api/users/profile-picture
-const setProfilePicture = async (req, res) => {
-    const { profilePicture } = req.body;
-
-    if (!profilePicture) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'Profielfoto is verplicht.',
-        });
-    }
-
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
-        }
-
-        // Alleen instellen als nog niet aanwezig
-        if (user.profilePicture) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Profielfoto is al ingesteld. Gebruik PUT om te updaten.',
-            });
-        }
-
-        user.profilePicture = profilePicture;
-        await user.save();
-
-        res.status(201).json({
-            status: 'success',
-            message: 'Profielfoto succesvol opgeslagen.',
-            data: { profilePicture: user.profilePicture },
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Fout bij opslaan van profielfoto.',
-            error: error.message,
-        });
-    }
-};
-
+ 
 
         // Controleer of de resetcode overeenkomt en niet verlopen is
         if (user.resetPasswordCode !== resetPasswordCode) {
@@ -348,39 +381,6 @@ const resetPassword = async (req, res) => {
             });
         }
 
-        // PUT /api/users/profile-picture
-const updateProfilePicture = async (req, res) => {
-    const { profilePicture } = req.body;
-
-    if (!profilePicture) {
-        return res.status(400).json({
-            status: 'error',
-            message: 'Profielfoto is verplicht.',
-        });
-    }
-
-    try {
-        const user = await User.findById(req.user.userId);
-        if (!user) {
-            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
-        }
-
-        user.profilePicture = profilePicture;
-        await user.save();
-
-        res.status(200).json({
-            status: 'success',
-            message: 'Profielfoto succesvol bijgewerkt.',
-            data: { profilePicture: user.profilePicture },
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Fout bij bijwerken van profielfoto.',
-            error: error.message,
-        });
-    }
-};
 
 
         // Stel het nieuwe wachtwoord in
@@ -412,6 +412,5 @@ module.exports = {
     verifyResetCode,
     resetPassword,
     getProfilePicture,
-    setProfilePicture,
     updateProfilePicture
 };
