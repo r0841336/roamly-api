@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, me, forgotPassword, resetPassword, verifyResetCode } = require('../../../controllers/api/v1/Users'); // Vergeet niet verifyResetCode toe te voegen
+const { register, login, me, forgotPassword, resetPassword, verifyResetCode, getProfilePicture } = require('../../../controllers/api/v1/Users');
 const authenticate = require('../../../middleware/Authentication'); // Importeer de authenticate middleware
 const User = require('../../../models/api/v1/User');
 
-router.get('/users/profile-picture', authenticate, userController.getProfilePicture);
+router.get('/users/profile-picture', authenticate, getProfilePicture);
 
 // Registratie route
 router.post('/register', register);
