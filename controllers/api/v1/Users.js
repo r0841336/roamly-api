@@ -136,27 +136,6 @@ const me = async (req, res) => {
     }
 };
 
-// GET /api/users/profile-picture
-const getProfilePicture = async (req, res) => {
-    try {
-        const user = await User.findById(req.user.userId).select('profilePicture');
-        if (!user) {
-            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
-        }
-
-        res.status(200).json({
-            status: 'success',
-            data: { profilePicture: user.profilePicture },
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: 'error',
-            message: 'Fout bij ophalen van profielfoto.',
-            error: error.message,
-        });
-    }
-};
-       // POST /api/users/profile-picture
 const setProfilePicture = async (req, res) => {
     const { profilePicture } = req.body;
 
@@ -197,6 +176,29 @@ const setProfilePicture = async (req, res) => {
         });
     }
 };
+
+
+// GET /api/users/profile-picture
+const getProfilePicture = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId).select('profilePicture');
+        if (!user) {
+            return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
+        }
+
+        res.status(200).json({
+            status: 'success',
+            data: { profilePicture: user.profilePicture },
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Fout bij ophalen van profielfoto.',
+            error: error.message,
+        });
+    }
+};
+       // POST /api/users/profile-picture
 
         // PUT /api/users/profile-picture
 const updateProfilePicture = async (req, res) => {
@@ -412,5 +414,6 @@ module.exports = {
     verifyResetCode,
     resetPassword,
     getProfilePicture,
-    updateProfilePicture
+    updateProfilePicture,
+    setProfilePicture
 };
