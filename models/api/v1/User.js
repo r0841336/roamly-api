@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['male', 'female', 'other'],
     },
+        profilePicture: {
+        type: String,
+    },
     token: {
         type: String, // <-- JWT token veld toegevoegd
     },

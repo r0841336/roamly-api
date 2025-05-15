@@ -17,7 +17,8 @@ const register = async (req, res) => {
         street,
         houseNumber,
         phoneNumber,
-        gender
+        gender,
+        profilePicture
     } = req.body;
 
     if (!email || !password) {
@@ -49,7 +50,8 @@ const register = async (req, res) => {
             street,
             houseNumber,
             phoneNumber,
-            gender
+            gender,
+            profilePicture
         });
 
         await user.save();
