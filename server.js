@@ -14,7 +14,8 @@ const app = express();
 const PORT = process.env.PORT || 5001;
 
 // ---- Google API Routes ----
-const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA';
+const API_KEY = 'AIzaSyBlpxT86DXT-8ugulNwJke4Oncf7yu7UcQ';
+//const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA';
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
