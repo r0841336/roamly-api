@@ -1,8 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const tripController = require("../../../controllers/api/v1/trips");
+const authenticate = require('../../../middleware/Authentication');
+const { create, index } = require('../../../controllers/api/v1/trips');
 
-router.post("/", tripController.create); // Create a new order
-router.get("/", tripController.index); // Get all orders
+router.post('/', authenticate, create); // 👈 protect the route
+router.get('/', authenticate, index);  // 👈 protect the route
 
 module.exports = router;

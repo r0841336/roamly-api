@@ -5,9 +5,13 @@ const TripSchema = new mongoose.Schema({
     Place: { type: String, required: true },
     StartDate: { type: Date, required: true },
     EndDate: { type: Date, required: true },
-    Plan: { type: mongoose.Schema.Types.Mixed, required: true } // Hier kan de hele AI-response in!
-});
-
+    Plan: { type: mongoose.Schema.Types.Mixed, required: true },
+    user: { // ✅ Add this
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    }
+  });
 const Trip = mongoose.model('Trip', TripSchema);
 
 module.exports = Trip;
