@@ -409,37 +409,44 @@ const resetPassword = async (req, res) => {
 };
 
 const updateMe = async (req, res) => {
-  const updates = req.body;
-
-  try {
-    const user = await User.findById(req.user.userId);
-    if (!user) {
-      return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
-    }
-
-    const allowedFields = ["firstName", "lastName", "email"];
-
-    allowedFields.forEach((field) => {
-      if (Object.prototype.hasOwnProperty.call(updates, field)) {
-        user[field] = updates[field];
+    const updates = req.body;
+    console.log("🔧 [updateMe] Received updates:", updates);
+    console.log("🔧 [updateMe] Authenticated user ID:", req.user?.userId);
+  
+    try {
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        console.error("❌ [updateMe] User not found.");
+        return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
       }
-    });
-
-    await user.save();
-
-    res.status(200).json({
-      status: "success",
-      message: "Profiel succesvol bijgewerkt.",
-      data: { user },
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Fout bij bijwerken van profiel.",
-      error: error.message,
-    });
-  }
-};
+  
+      const allowedFields = ["firstName", "lastName", "email"];
+  
+      allowedFields.forEach((field) => {
+        if (Object.prototype.hasOwnProperty.call(updates, field)) {
+          console.log(`📝 Updating ${field} to:`, updates[field]);
+          user[field] = updates[field];
+        }
+      });
+  
+      await user.save();
+  
+      console.log("✅ [updateMe] Profile updated:", user);
+  
+      res.status(200).json({
+        status: "success",
+        message: "Profiel succesvol bijgewerkt.",
+        data: { user },
+      });
+    } catch (error) {
+      console.error("🔥 [updateMe] Error:", error);
+      res.status(500).json({
+        status: "error",
+        message: "Fout bij bijwerken van profiel.",
+        error: error.message,
+      });
+    }
+  };
 
 
 module.exports = {
