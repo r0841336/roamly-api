@@ -179,6 +179,39 @@ const setProfilePicture = async (req, res) => {
     }
 };
 
+const updatePassword = async (req, res) => {
+    const { password } = req.body;
+  
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Wachtwoord moet minstens 6 tekens lang zijn.',
+      });
+    }
+  
+    try {
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
+      }
+  
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+  
+      res.status(200).json({
+        status: 'success',
+        message: 'Wachtwoord succesvol bijgewerkt.',
+      });
+    } catch (error) {
+      console.error("🔥 [updatePassword] Error:", error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Er is een fout opgetreden bij het bijwerken van het wachtwoord.',
+        error: error.message,
+      });
+    }
+  };
+
 
 // GET /api/users/profile-picture
 const getProfilePicture = async (req, res) => {
@@ -459,5 +492,6 @@ module.exports = {
     resetPassword,
     getProfilePicture,
     updateProfilePicture,
-    setProfilePicture
+    setProfilePicture,
+    updatePassword
 };
