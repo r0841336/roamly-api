@@ -417,22 +417,10 @@ const updateMe = async (req, res) => {
       return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
     }
 
-    // Update only allowed fields (basic validation)
-    const allowedFields = [
-      "firstName",
-      "lastName",
-      "email",
-      "phoneNumber",
-      "country",
-      "postcode",
-      "city",
-      "street",
-      "houseNumber",
-      "gender"
-    ];
+    const allowedFields = ["firstName", "lastName", "email"];
 
     allowedFields.forEach((field) => {
-      if (updates[field] !== undefined) {
+      if (Object.prototype.hasOwnProperty.call(updates, field)) {
         user[field] = updates[field];
       }
     });
@@ -449,9 +437,10 @@ const updateMe = async (req, res) => {
       status: "error",
       message: "Fout bij bijwerken van profiel.",
       error: error.message,
-    });
-  }
+    });
+  }
 };
+
 
 module.exports = {
     register,
