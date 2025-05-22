@@ -408,10 +408,56 @@ const resetPassword = async (req, res) => {
     }
 };
 
+const updateMe = async (req, res) => {
+  const updates = req.body;
+
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
+    }
+
+    // Update only allowed fields (basic validation)
+    const allowedFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phoneNumber",
+      "country",
+      "postcode",
+      "city",
+      "street",
+      "houseNumber",
+      "gender"
+    ];
+
+    allowedFields.forEach((field) => {
+      if (updates[field] !== undefined) {
+        user[field] = updates[field];
+      }
+    });
+
+    await user.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Profiel succesvol bijgewerkt.",
+      data: { user },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Fout bij bijwerken van profiel.",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
     register,
     login,
     me,
+    updateMe,
     forgotPassword,
     verifyResetCode,
     resetPassword,
