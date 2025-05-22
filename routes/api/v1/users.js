@@ -11,6 +11,7 @@ const {
   getProfilePicture,
   updateProfilePicture,
   setProfilePicture,
+  updatePassword // ✅ ADD THIS
 } = require('../../../controllers/api/v1/Users');
 
 const authenticate = require('../../../middleware/Authentication');
@@ -22,7 +23,8 @@ router.post('/login', login);
 
 // 🔐 Protected profile routes
 router.get('/me', authenticate, me);
-router.put('/me', authenticate, updateMe); // ✅ THIS IS THE MISSING ROUTE
+router.put('/me', authenticate, updateMe);
+router.put('/update-password', authenticate, updatePassword); // ✅ ADD THIS LINE
 
 // 🔄 Password reset flows
 router.post('/forgot-password', forgotPassword);
@@ -34,7 +36,7 @@ router.get('/users/profile-picture', authenticate, getProfilePicture);
 router.post('/users/profile-picture', authenticate, setProfilePicture);
 router.put('/users/profile-picture', authenticate, updateProfilePicture);
 
-// 🔍 Admin route (if needed)
+// 🔍 Admin route (optional)
 router.get('/', authenticate, async (req, res) => {
   try {
     const users = await User.find();
