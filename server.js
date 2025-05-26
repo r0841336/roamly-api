@@ -9,6 +9,8 @@ const config = require('config');
 const createError = require('http-errors');
 const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
+const reviewRoutes = require('./routes/api/v1/reviews');
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -146,6 +148,8 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
 // Routes
 app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+
 
 // Error handlers
 app.use((req, res, next) => {
