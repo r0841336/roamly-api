@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema({
+  placeName: {
+    type: String,
+    required: true
+  },
   general: {
     accessibility: String,
     parkingSuitable: String,
