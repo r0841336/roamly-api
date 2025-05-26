@@ -1,47 +1,56 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, me, forgotPassword, resetPassword, verifyResetCode, getProfilePicture } = require('../../../controllers/api/v1/Users');
-const authenticate = require('../../../middleware/Authentication'); // Importeer de authenticate middleware
+const {
+  register,
+  login,
+  me,
+  updateMe,
+  forgotPassword,
+  resetPassword,
+  verifyResetCode,
+  getProfilePicture,
+  updateProfilePicture,
+  setProfilePicture,
+  updatePassword // ✅ ADD THIS
+} = require('../../../controllers/api/v1/Users');
+
+const authenticate = require('../../../middleware/Authentication');
 const User = require('../../../models/api/v1/User');
 
-router.get('/users/profile-picture', authenticate, getProfilePicture);
-
-// Registratie route
+// 🧠 Auth routes
 router.post('/register', register);
-
-// Login route
 router.post('/login', login);
 
-// Profiel ophalen route (met authenticatie)
+// 🔐 Protected profile routes
 router.get('/me', authenticate, me);
+router.put('/me', authenticate, updateMe);
+router.put('/update-password', authenticate, updatePassword); // ✅ ADD THIS LINE
 
-// Nieuwe route voor het aanvragen van een wachtwoordreset
+// 🔄 Password reset flows
 router.post('/forgot-password', forgotPassword);
-
-// Nieuwe route voor het resetten van het wachtwoord
 router.post('/reset-password', resetPassword);
+router.post('/verify-reset-code', verifyResetCode);
 
-// Nieuwe route voor het verifiëren van de resetcode
-router.post('/verify-reset-code', verifyResetCode); // Toegevoegd
+// 🖼️ Profile picture handling
+router.get('/users/profile-picture', authenticate, getProfilePicture);
+router.post('/users/profile-picture', authenticate, setProfilePicture);
+router.put('/users/profile-picture', authenticate, updateProfilePicture);
 
-// Nieuwe route voor het ophalen van alle gebruikers (beschermd met authenticatie)
+// 🔍 Admin route (optional)
 router.get('/', authenticate, async (req, res) => {
-    try {
-        // Haal alle gebruikers op uit de database
-        const users = await User.find();
-        
-        // Retourneer de gebruikersdata
-        res.status(200).json({
-            status: "success",
-            data: { users }
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: "error",
-            message: "Er is een fout opgetreden bij het ophalen van de gebruikers.",
-            error: error.message,
-        });
-    }
+  try {
+    const users = await User.find();
+    res.status(200).json({
+      status: 'success',
+      data: { users },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Er is een fout opgetreden bij het ophalen van de gebruikers.',
+      error: error.message,
+    });
+  }
 });
 
 module.exports = router;

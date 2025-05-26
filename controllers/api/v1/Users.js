@@ -179,6 +179,39 @@ const setProfilePicture = async (req, res) => {
     }
 };
 
+const updatePassword = async (req, res) => {
+    const { password } = req.body;
+  
+    if (!password || password.length < 6) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Wachtwoord moet minstens 6 tekens lang zijn.',
+      });
+    }
+  
+    try {
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        return res.status(404).json({ status: 'error', message: 'Gebruiker niet gevonden.' });
+      }
+  
+      user.password = await bcrypt.hash(password, 10);
+      await user.save();
+  
+      res.status(200).json({
+        status: 'success',
+        message: 'Wachtwoord succesvol bijgewerkt.',
+      });
+    } catch (error) {
+      console.error("🔥 [updatePassword] Error:", error);
+      res.status(500).json({
+        status: 'error',
+        message: 'Er is een fout opgetreden bij het bijwerken van het wachtwoord.',
+        error: error.message,
+      });
+    }
+  };
+
 
 // GET /api/users/profile-picture
 const getProfilePicture = async (req, res) => {
@@ -409,37 +442,44 @@ const resetPassword = async (req, res) => {
 };
 
 const updateMe = async (req, res) => {
-  const updates = req.body;
-
-  try {
-    const user = await User.findById(req.user.userId);
-    if (!user) {
-      return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
-    }
-
-    const allowedFields = ["firstName", "lastName", "email"];
-
-    allowedFields.forEach((field) => {
-      if (Object.prototype.hasOwnProperty.call(updates, field)) {
-        user[field] = updates[field];
+    const updates = req.body;
+    console.log("🔧 [updateMe] Received updates:", updates);
+    console.log("🔧 [updateMe] Authenticated user ID:", req.user?.userId);
+  
+    try {
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        console.error("❌ [updateMe] User not found.");
+        return res.status(404).json({ status: "error", message: "Gebruiker niet gevonden." });
       }
-    });
-
-    await user.save();
-
-    res.status(200).json({
-      status: "success",
-      message: "Profiel succesvol bijgewerkt.",
-      data: { user },
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Fout bij bijwerken van profiel.",
-      error: error.message,
-    });
-  }
-};
+  
+      const allowedFields = ["firstName", "lastName", "email"];
+  
+      allowedFields.forEach((field) => {
+        if (Object.prototype.hasOwnProperty.call(updates, field)) {
+          console.log(`📝 Updating ${field} to:`, updates[field]);
+          user[field] = updates[field];
+        }
+      });
+  
+      await user.save();
+  
+      console.log("✅ [updateMe] Profile updated:", user);
+  
+      res.status(200).json({
+        status: "success",
+        message: "Profiel succesvol bijgewerkt.",
+        data: { user },
+      });
+    } catch (error) {
+      console.error("🔥 [updateMe] Error:", error);
+      res.status(500).json({
+        status: "error",
+        message: "Fout bij bijwerken van profiel.",
+        error: error.message,
+      });
+    }
+  };
 
 
 module.exports = {
@@ -452,5 +492,6 @@ module.exports = {
     resetPassword,
     getProfilePicture,
     updateProfilePicture,
-    setProfilePicture
+    setProfilePicture,
+    updatePassword
 };
