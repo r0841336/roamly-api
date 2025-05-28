@@ -86,7 +86,7 @@ exports.updateReviewPartial = async (req, res) => {
   } catch (err) {
     console.error('Error partially updating review:', err);
     res.status(500).send("Error updating review");
-  }
+  }
 };
 
 // Delete a review

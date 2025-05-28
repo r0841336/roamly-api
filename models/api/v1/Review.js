@@ -53,6 +53,14 @@ const reviewSchema = new mongoose.Schema({
     whyOrWhyNot: String,
     additionalFeedback: String
   },
+  textReview: {
+  type: String,
+  default: ""
+},
+photos: {
+  type: [String], // Array van URLs of base64 strings
+  default: []
+},
   points: {
     type: Number,
     default: 0
