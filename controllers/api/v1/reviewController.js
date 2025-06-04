@@ -86,7 +86,7 @@ exports.updateReviewPartial = async (req, res) => {
   } catch (err) {
     console.error('Error partially updating review:', err);
     res.status(500).send("Error updating review");
-  }
+  }
 };
 
 // Delete a review
@@ -99,6 +99,15 @@ exports.deleteReview = async (req, res) => {
     res.json({ message: 'Review deleted' });
   } catch (error) {
     console.error('Error deleting review:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+exports.getReviewsByUserId = async (req, res) => {
+  try {
+    const reviews = await Review.find({ user: req.params.userId });
+    res.json(reviews);
+  } catch (error) {
+    console.error('Error getting user reviews:', error);
     res.status(500).json({ error: error.message });
   }
 };
