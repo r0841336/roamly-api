@@ -5,6 +5,10 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+    username: { 
+    type: String,
+    default: "Anonymous"
+  },
   general: {
     accessibility: String,
     parkingSuitable: String,
