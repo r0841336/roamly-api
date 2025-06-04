@@ -9,11 +9,7 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     default: "Anonymous"
   },
-    userId: {  // 👈 Nieuw veld toegevoegd
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',  // optioneel: alleen als je een aparte User-collectie gebruikt
-    required: true
-  },
+  
   general: {
     accessibility: String,
     parkingSuitable: String,
