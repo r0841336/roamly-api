@@ -11,12 +11,13 @@ const {
   getProfilePicture,
   updateProfilePicture,
   setProfilePicture,
-  updatePassword // ✅ ADD THIS
+  updatePassword,
+  addTrips,
+  decrementTripCount // ✅ Voeg dit hier toe!
 } = require('../../../controllers/api/v1/Users');
 
 const authenticate = require('../../../middleware/Authentication');
 const User = require('../../../models/api/v1/User');
-const { addTrips } = require('../../../controllers/api/v1/Users');
 
 // 🧠 Auth routes
 router.post('/register', register);
@@ -25,13 +26,16 @@ router.post('/login', login);
 // 🔐 Protected profile routes
 router.get('/me', authenticate, me);
 router.put('/me', authenticate, updateMe);
-router.put('/update-password', authenticate, updatePassword); // ✅ ADD THIS LINE
+router.put('/update-password', authenticate, updatePassword);
 
 // 🔄 Password reset flows
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.post('/verify-reset-code', verifyResetCode);
 router.post('/add-trips', authenticate, addTrips);
+
+// 🛑 PATCH endpoint voor tripcount
+router.patch('/decrement-tripcount', authenticate, decrementTripCount); // ✅ Voeg dit toe!
 
 // 🖼️ Profile picture handling
 router.get('/users/profile-picture', authenticate, getProfilePicture);
