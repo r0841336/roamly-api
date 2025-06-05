@@ -45,11 +45,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/v1/trips', tripRoutes); // Gebruik de routes voor trips
 app.use('/api/v1/users', userRoutes); // Gebruik de routes voor users (toegevoegd)
 
-// catch 404 and forward to error handler
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Catch-all route to serve index.html for React Router
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// 404 handler
 app.use(function(req, res, next) {
   next(createError(404));
 });
-
 // error handler
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development

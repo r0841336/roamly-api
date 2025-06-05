@@ -11,14 +11,10 @@ const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
 const reviewRoutes = require('./routes/api/v1/reviews');
 
-
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 // ---- Google API Routes ----
-//const API_KEY = 'AIzaSyB6tiwZ7GJ5KzEVLQe2AKZjhbOn0JCEdio';
-//const API_KEY = 'AIzaSyBlpxT86DXT-8ugulNwJke4Oncf7yu7UcQ';
-//const API_KEY = 'AIzaSyARMMWTVxjvo8qABcvXgZpHt6FJL63CDpA';
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
@@ -28,7 +24,9 @@ app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// 1️⃣ Serve static files from dist (Vite build output)
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // Google Maps API Routes
 app.get('/api/coordinates', async (req, res) => {
@@ -96,7 +94,6 @@ app.get('/api/mapembed', (req, res) => {
   res.json({ embedUrl });
 });
 
-
 app.get('/api/place/:id', async (req, res) => {
   const placeId = req.params.id;
 
@@ -134,8 +131,6 @@ app.get('/api/place/:id', async (req, res) => {
   }
 });
 
-
-
 // MongoDB Verbinding
 const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
@@ -150,6 +145,12 @@ mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true }
 app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
+
+// 2️⃣ Catch-all to serve index.html for SPA routing
+app.get('*', (req, res) => {
+  console.log(`Catch-all received: ${req.path}`);
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
 
 
 // Error handlers
