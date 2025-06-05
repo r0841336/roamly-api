@@ -481,6 +481,42 @@ const updateMe = async (req, res) => {
     }
   };
 
+  const addTrips = async (req, res) => {
+    try {
+      const { amount } = req.body; // e.g. { amount: 10 }
+      if (!amount || amount <= 0) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Please specify a valid amount of trips to add.'
+        });
+      }
+  
+      const user = await User.findById(req.user.userId);
+      if (!user) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'User not found.'
+        });
+      }
+  
+      user.tripcount += amount;
+      await user.save();
+  
+      res.status(200).json({
+        status: 'success',
+        message: `${amount} trips added successfully.`,
+        data: { tripcount: user.tripcount }
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        status: 'error',
+        message: 'An error occurred while adding trips.',
+        error: error.message
+      });
+    }
+  };
+
 
 module.exports = {
     register,
@@ -493,5 +529,6 @@ module.exports = {
     getProfilePicture,
     updateProfilePicture,
     setProfilePicture,
-    updatePassword
+    updatePassword,
+    addTrips,
 };

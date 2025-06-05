@@ -16,6 +16,7 @@ const {
 
 const authenticate = require('../../../middleware/Authentication');
 const User = require('../../../models/api/v1/User');
+const { addTrips } = require('../../../controllers/api/v1/Users');
 
 // 🧠 Auth routes
 router.post('/register', register);
@@ -30,6 +31,7 @@ router.put('/update-password', authenticate, updatePassword); // ✅ ADD THIS LI
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 router.post('/verify-reset-code', verifyResetCode);
+router.post('/add-trips', authenticate, addTrips);
 
 // 🖼️ Profile picture handling
 router.get('/users/profile-picture', authenticate, getProfilePicture);
