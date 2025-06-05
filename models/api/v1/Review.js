@@ -9,6 +9,12 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     default: "Anonymous"
   },
+
+    userId: {  // 🔑 hier voeg je de user-id toe
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true  // verplicht veld
+  },
   
   general: {
     accessibility: String,
