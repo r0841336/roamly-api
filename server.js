@@ -148,8 +148,10 @@ app.use('/api/v1/reviews', reviewRoutes);
 
 // 2️⃣ Catch-all to serve index.html for SPA routing
 app.get('*', (req, res) => {
+  console.log(`Catch-all received: ${req.path}`);
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
+
 
 // Error handlers
 app.use((req, res, next) => {
