@@ -517,6 +517,43 @@ const updateMe = async (req, res) => {
     }
   };
 
+  // Decrement tripcount endpoint
+const decrementTripCount = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({
+        status: 'error',
+        message: 'Gebruiker niet gevonden.',
+      });
+    }
+
+    if (user.tripcount <= 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Je hebt geen trips meer over.',
+      });
+    }
+
+    user.tripcount -= 1;
+    await user.save();
+
+    res.status(200).json({
+      status: 'success',
+      message: 'Tripcount succesvol verlaagd.',
+      data: { tripcount: user.tripcount },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Er is een fout opgetreden bij het verlagen van tripcount.',
+      error: error.message,
+    });
+  }
+};
+
+
 
 module.exports = {
     register,
@@ -531,4 +568,5 @@ module.exports = {
     setProfilePicture,
     updatePassword,
     addTrips,
+    decrementTripCount,
 };
