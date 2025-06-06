@@ -10,6 +10,7 @@ const createError = require('http-errors');
 const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
 const reviewRoutes = require('./routes/api/v1/reviews');
+
 const app = express();
 const PORT = process.env.PORT || 5001;
 
@@ -18,15 +19,18 @@ const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
 const API_KEY = process.env.API_KEY;
 
+// 🔥 Simple in-memory cache object
+const placeCache = {};
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-
 app.use(express.static(path.join(__dirname, 'dist')));
 
+// Geocode endpoint
 app.get('/api/coordinates', async (req, res) => {
   const { location } = req.query;
   try {
@@ -47,8 +51,16 @@ app.get('/api/coordinates', async (req, res) => {
   }
 });
 
+// 🔥 Caching-enabled places endpoint
 app.get('/api/places', async (req, res) => {
   const { query, location, radius } = req.query;
+  const cacheKey = `${query}|${location}|${radius}`;
+
+  if (placeCache[cacheKey]) {
+    console.log("✅ Serving from cache:", cacheKey);
+    return res.json(placeCache[cacheKey]);
+  }
+
   try {
     const response = await axios.get(PLACES_API_BASE_URL, {
       params: { query, location, radius, key: API_KEY },
@@ -76,6 +88,10 @@ app.get('/api/places', async (req, res) => {
       };
     });
 
+    // ⏳ Save data in cache
+    placeCache[cacheKey] = places;
+    console.log("📝 Added to cache:", cacheKey);
+
     res.json(places);
   } catch (error) {
     console.error(error.response?.data || error.message);
@@ -83,6 +99,7 @@ app.get('/api/places', async (req, res) => {
   }
 });
 
+// Google Maps embed
 app.get('/api/mapembed', (req, res) => {
   const { location } = req.query;
   if (!location) {
@@ -92,6 +109,7 @@ app.get('/api/mapembed', (req, res) => {
   res.json({ embedUrl });
 });
 
+// Place details
 app.get('/api/place/:id', async (req, res) => {
   const placeId = req.params.id;
 
@@ -129,6 +147,7 @@ app.get('/api/place/:id', async (req, res) => {
   }
 });
 
+// MongoDB
 const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
 mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -143,12 +162,11 @@ app.use('/api/v1/trips', tripRoutes);
 app.use('/api/v1/users', userRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 
-// 2️⃣ Catch-all to serve index.html for SPA routing
+// SPA fallback
 app.get('*', (req, res) => {
   console.log(`Catch-all received: ${req.path}`);
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
-
 
 // Error handlers
 app.use((req, res, next) => {
@@ -166,5 +184,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
