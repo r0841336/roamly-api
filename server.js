@@ -10,7 +10,7 @@ const createError = require('http-errors');
 const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
 const reviewRoutes = require('./routes/api/v1/reviews');
-const key = AIzaSyCEIuQFjqeGW_iAsLl4OB_FplsNXfMqiSg;
+const API_KEY = AIzaSyCEIuQFjqeGW_iAsLl4OB_FplsNXfMqiSg;
 const app = express();
 const PORT = process.env.PORT || 5001;
 
