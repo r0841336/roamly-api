@@ -10,25 +10,21 @@ const createError = require('http-errors');
 const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
 const reviewRoutes = require('./routes/api/v1/reviews');
-
+const key = AIzaSyCEIuQFjqeGW_iAsLl4OB_FplsNXfMqiSg;
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ---- Google API Routes ----
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-// 1️⃣ Serve static files from dist (Vite build output)
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Google Maps API Routes
 app.get('/api/coordinates', async (req, res) => {
   const { location } = req.query;
   try {
@@ -131,7 +127,6 @@ app.get('/api/place/:id', async (req, res) => {
   }
 });
 
-// MongoDB Verbinding
 const connection = config.get('mongodb');
 console.log(`Connecting to ${connection}`);
 mongoose.connect(connection, { useNewUrlParser: true, useUnifiedTopology: true })
