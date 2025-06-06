@@ -10,12 +10,12 @@ const createError = require('http-errors');
 const tripRoutes = require('./routes/api/v1/trips');
 const userRoutes = require('./routes/api/v1/users');
 const reviewRoutes = require('./routes/api/v1/reviews');
-const API_KEY = AIzaSyCEIuQFjqeGW_iAsLl4OB_FplsNXfMqiSg;
 const app = express();
 const PORT = process.env.PORT || 5001;
 
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
+const API_KEY = AIzaSyCEIuQFjqeGW_iAsLl4OB_FplsNXfMqiSg;
 
 app.use(cors());
 app.use(express.json());
