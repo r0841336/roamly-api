@@ -16,6 +16,9 @@ const PORT = process.env.PORT || 5001;
 const PLACES_API_BASE_URL = 'https://maps.googleapis.com/maps/api/place/textsearch/json';
 const GEO_API_BASE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 
+const API_KEY = process.env.API_KEY;
+
+
 app.use(cors());
 app.use(express.json());
 app.use(logger('dev'));
