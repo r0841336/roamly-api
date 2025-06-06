@@ -8,7 +8,7 @@ router.get('/', authenticate, tripController.index);
 router.delete('/:id', authenticate, tripController.deleteTrip);
 
 router.patch('/add-activity', authenticate, tripController.addActivityToDay);
-router.patch('/remove-activity', authenticate, tripController.removeActivityFromDay);
+router.patch('/remove-item', authenticate, tripController.removeItemFromTrip);
 
 
 module.exports = router;

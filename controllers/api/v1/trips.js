@@ -139,56 +139,47 @@ const addActivityToDay = async (req, res) => {
     });
   }
 };
+const removeItemFromTrip = async (req, res) => {
+  const { tripId, dayIndex, item, type } = req.body;
 
-const removeActivityFromDay = async (req, res) => {
-  const { tripId, dayIndex, activity } = req.body;
-
-  if (!tripId || dayIndex === undefined || !activity) {
-    return res.status(400).json({
-      status: "error",
-      message: "Trip ID, dayIndex, and activity are required.",
-    });
+  if (!tripId || !item || !type) {
+    return res.status(400).json({ message: "tripId, item, and type are required." });
   }
 
   try {
     const trip = await Trip.findOne({ _id: tripId, user: req.user.userId });
     if (!trip) {
-      return res.status(404).json({
-        status: "error",
-        message: "Trip not found or no permission.",
-      });
+      return res.status(404).json({ message: "Trip not found or unauthorized." });
     }
 
     let plan = typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
 
-    if (!plan.itinerary || !plan.itinerary[dayIndex]) {
-      return res.status(400).json({
-        status: "error",
-        message: "Invalid day index.",
-      });
+    if (!plan.itinerary || !Array.isArray(plan.itinerary)) {
+      return res.status(400).json({ message: "Invalid trip structure." });
     }
 
-    plan.itinerary[dayIndex].activities = plan.itinerary[dayIndex].activities.filter(
-      (a) => a !== activity
-    );
+    if (type === "activity") {
+      plan.itinerary[dayIndex].activities = plan.itinerary[dayIndex].activities.filter(a => a !== item);
+    } else if (type === "restaurant") {
+      plan.itinerary[dayIndex].restaurants = plan.itinerary[dayIndex].restaurants.filter(r => r !== item);
+    } else if (type === "hotel") {
+      plan.hotel = null;
+    } else {
+      return res.status(400).json({ message: "Invalid item type." });
+    }
 
     trip.Plan = JSON.stringify(plan);
     await trip.save();
 
-    res.status(200).json({
-      status: "success",
-      message: `Activity removed from Day ${dayIndex + 1}.`,
-      data: { trip },
-    });
+    res.status(200).json({ status: "success", message: "Item removed from trip." });
   } catch (error) {
     res.status(500).json({
       status: "error",
-      message: "Error removing activity.",
+      message: "Server error while removing item.",
       error: error.message,
     });
   }
 };
-
 
 // ✅ Export all functions
 module.exports = {
@@ -196,5 +187,5 @@ module.exports = {
   index,
   deleteTrip,
   addActivityToDay, 
-  removeActivityFromDay, 
+  removeItemFromTrip
 };
