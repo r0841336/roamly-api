@@ -53,44 +53,8 @@ const index = async (req, res) => {
   }
 };
 
-// ✅ Delete a trip
-const deleteTrip = async (req, res) => {
-  const tripId = req.params.id;
-
-  if (!tripId) {
-    return res.status(400).json({
-      status: "error",
-      message: "Trip ID is required.",
-    });
-  }
-
-  try {
-    const trip = await Trip.findOne({ _id: tripId, user: req.user.userId });
-    if (!trip) {
-      return res.status(404).json({
-        status: "error",
-        message: "Trip not found or no permission.",
-      });
-    }
-
-    await Trip.deleteOne({ _id: tripId });
-
-    res.status(200).json({
-      status: "success",
-      message: "Trip successfully deleted.",
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: "error",
-      message: "Error deleting trip.",
-      error: error.message,
-    });
-  }
-};
-
-// ✅ Export all
+// ✅ Export both
 module.exports = {
   create,
-  index,
-  deleteTrip
+  index
 };
