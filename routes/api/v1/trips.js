@@ -9,6 +9,7 @@ router.delete('/:id', authenticate, tripController.deleteTrip);
 
 router.patch('/add-activity', authenticate, tripController.addActivityToDay);
 router.patch('/remove-activity', authenticate, tripController.removeActivityFromDay);
-
+router.patch('/remove-restaurant', authenticate, tripController.removeRestaurantFromDay);
+router.patch('/remove-hotel', authenticate, tripController.removeHotel);
 
 module.exports = router;

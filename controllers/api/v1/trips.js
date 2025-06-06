@@ -7,7 +7,8 @@ const create = async (req, res) => {
   if (!TripName || !Place || !StartDate || !EndDate || !Plan) {
     return res.status(400).json({
       status: "error",
-      message: "All fields (TripName, Place, StartDate, EndDate, Plan) are required.",
+      message:
+        "All fields (TripName, Place, StartDate, EndDate, Plan) are required.",
     });
   }
 
@@ -18,7 +19,7 @@ const create = async (req, res) => {
       StartDate,
       EndDate,
       Plan,
-      user: req.user.userId // 👈 attach user to trip
+      user: req.user.userId, // 👈 attach user to trip
     });
 
     await trip.save();
@@ -109,7 +110,8 @@ const addActivityToDay = async (req, res) => {
     }
 
     // Parse plan if stored as string
-    let plan = typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
+    let plan =
+      typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
 
     // Check if day exists
     if (!plan.itinerary || !plan.itinerary[dayIndex]) {
@@ -159,7 +161,8 @@ const removeActivityFromDay = async (req, res) => {
       });
     }
 
-    let plan = typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
+    let plan =
+      typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
 
     if (!plan.itinerary || !plan.itinerary[dayIndex]) {
       return res.status(400).json({
@@ -168,9 +171,9 @@ const removeActivityFromDay = async (req, res) => {
       });
     }
 
-    plan.itinerary[dayIndex].activities = plan.itinerary[dayIndex].activities.filter(
-      (a) => a !== activity
-    );
+    plan.itinerary[dayIndex].activities = plan.itinerary[
+      dayIndex
+    ].activities.filter((a) => a !== activity);
 
     trip.Plan = JSON.stringify(plan);
     await trip.save();
@@ -188,13 +191,103 @@ const removeActivityFromDay = async (req, res) => {
     });
   }
 };
+const removeRestaurantFromDay = async (req, res) => {
+  const { tripId, dayIndex, restaurant } = req.body;
 
+  if (!tripId || dayIndex === undefined || !restaurant) {
+    return res.status(400).json({
+      status: "error",
+      message: "Trip ID, dayIndex, and restaurant are required.",
+    });
+  }
+
+  try {
+    const trip = await Trip.findOne({ _id: tripId, user: req.user.userId });
+    if (!trip) {
+      return res.status(404).json({
+        status: "error",
+        message: "Trip not found or no permission.",
+      });
+    }
+
+    let plan =
+      typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
+
+    if (!plan.itinerary || !plan.itinerary[dayIndex]) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid day index.",
+      });
+    }
+
+    plan.itinerary[dayIndex].restaurants = (
+      plan.itinerary[dayIndex].restaurants || []
+    ).filter((r) => r !== restaurant);
+
+    trip.Plan = JSON.stringify(plan);
+    await trip.save();
+
+    res.status(200).json({
+      status: "success",
+      message: `Restaurant removed from Day ${dayIndex + 1}.`,
+      data: { trip },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Error removing restaurant.",
+      error: error.message,
+    });
+  }
+};
+const removeHotel = async (req, res) => {
+  const { tripId } = req.body;
+
+  if (!tripId) {
+    return res.status(400).json({
+      status: "error",
+      message: "Trip ID is required.",
+    });
+  }
+
+  try {
+    const trip = await Trip.findOne({ _id: tripId, user: req.user.userId });
+    if (!trip) {
+      return res.status(404).json({
+        status: "error",
+        message: "Trip not found or no permission.",
+      });
+    }
+
+    let plan =
+      typeof trip.Plan === "string" ? JSON.parse(trip.Plan) : trip.Plan;
+
+    plan.hotel = null;
+
+    trip.Plan = JSON.stringify(plan);
+    await trip.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "Hotel removed successfully.",
+      data: { trip },
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: "error",
+      message: "Error removing hotel.",
+      error: error.message,
+    });
+  }
+};
 
 // ✅ Export all functions
 module.exports = {
   create,
   index,
   deleteTrip,
-  addActivityToDay, 
-  removeActivityFromDay, 
+  addActivityToDay,
+  removeActivityFromDay,
+  removeRestaurantFromDay,
+  removeHotel,
 };
