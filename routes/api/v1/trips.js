@@ -7,4 +7,7 @@ router.post('/', authenticate, tripController.create);
 router.get('/', authenticate, tripController.index);
 router.delete('/:id', authenticate, tripController.deleteTrip);
 
+router.patch('/add-activity', authenticate, tripController.addActivityToDay);
+
+
 module.exports = router;
